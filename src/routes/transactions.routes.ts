@@ -1,11 +1,16 @@
 import { Router } from 'express';
+import multer from 'multer';
+
 import { getCustomRepository } from 'typeorm';
-import Transaction from '../models/Transaction';
-import CreateTransactionService from '../services/CreateTransactionService';
+
 import TransactionsRepository from '../repositories/TransactionsRepository';
-// [X] import CreateTransactionService from '../services/CreateTransactionService';
-// import DeleteTransactionService from '../services/DeleteTransactionService';
-// import ImportTransactionsService from '../services/ImportTransactionsService';
+import CreateTransactionService from '../services/CreateTransactionService';
+import DeleteTransactionService from '../services/DeleteTransactionService';
+import ImportTransactionsService from '../services/ImportTransactionsService';
+
+import uploadConfig from '../config/upload';
+
+const upload = multer(uploadConfig);
 
 const transactionsRouter = Router();
 
@@ -21,13 +26,6 @@ transactionsRouter.get('/', async (request, response) => {
 transactionsRouter.post('/', async (request, response) => {
   const { title, value, type, category } = request.body;
 
-  /**
-
-Antes de criar uma nova categoria, sempre verifique se já existe uma categoria
-com o mesmo título. Caso ela exista, use o id já existente no banco de dados.
-
- */
-
   const createTransaction = new CreateTransactionService();
 
   const transaction = await createTransaction.execute({
@@ -41,11 +39,25 @@ com o mesmo título. Caso ela exista, use o id já existente no banco de dados.
 });
 
 transactionsRouter.delete('/:id', async (request, response) => {
-  // TODO
+  const { id } = request.params;
+
+  const deleteTransaction = new DeleteTransactionService();
+
+  await deleteTransaction.execute(id);
+
+  return response.status(204).send();
 });
 
-transactionsRouter.post('/import', async (request, response) => {
-  // TODO
-});
+transactionsRouter.post(
+  '/import',
+  upload.single('file'),
+  async (request, response) => {
+    const importTransactions = new ImportTransactionsService();
+
+    const transactions = await importTransactions.execute(request.file.path);
+
+    return response.json(transactions);
+  },
+);
 
 export default transactionsRouter;

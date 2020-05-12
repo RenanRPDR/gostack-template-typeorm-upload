@@ -1,5 +1,5 @@
-// import AppError from '../errors/AppError';
 import { getCustomRepository, getRepository } from 'typeorm';
+import AppError from '../errors/AppError';
 
 import Transaction from '../models/Transaction';
 import Category from '../models/Category';
@@ -22,6 +22,12 @@ class CreateTransactionService {
     const transactionsRepository = getCustomRepository(TransactionsRepository);
     const categoryRepository = getRepository(Category);
 
+    const { total } = await transactionsRepository.getBalance();
+
+    if (type === 'outcome' && total < value) {
+      throw new AppError('You do not have enough balance');
+    }
+
     let findCategoryWithSameName = await categoryRepository.findOne({
       where: {
         title: category,
@@ -34,13 +40,7 @@ class CreateTransactionService {
       });
 
       await categoryRepository.save(findCategoryWithSameName);
-    } else {
-      console.log({ message: 'This category already exist' });
     }
-
-    /* else {
-      console.log({ message: 'This category already exist' });
-    } */
 
     const transaction = transactionsRepository.create({
       title,
