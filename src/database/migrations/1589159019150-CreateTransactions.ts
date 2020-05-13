@@ -19,19 +19,14 @@ export default class CreateTransactions1589159019150
             type: 'varchar',
           },
           {
-            name: 'value',
-            type: 'decimal',
-            precision: 10,
-            scale: 2,
-          },
-          {
             name: 'type',
             type: 'varchar',
           },
           {
-            name: 'category_id',
-            type: 'uuid',
-            isNullable: true,
+            name: 'value',
+            type: 'decimal',
+            precision: 10,
+            scale: 2,
           },
           {
             name: 'created_at',
@@ -42,6 +37,11 @@ export default class CreateTransactions1589159019150
             name: 'updated_at',
             type: 'timestamp',
             default: 'now()',
+          },
+          {
+            name: 'category_id',
+            type: 'uuid',
+            isNullable: true,
           },
         ],
       }),
