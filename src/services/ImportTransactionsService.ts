@@ -32,7 +32,7 @@ class ImportTransactionsService {
 
     parseCSV.on('data', async line => {
       const [title, type, value, category] = line.map((cell: string) =>
-        cell.trim().split(','),
+        cell.trim(),
       );
 
       if (!title || !type || !value) return;
